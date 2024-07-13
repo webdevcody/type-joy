@@ -150,30 +150,23 @@ func main() {
 		}
 	})
 
-	// TODO: figure out why this doesn't trigger until the first key is pressed
-	hook.Register(hook.MouseHold, []string{"mleft"}, func(e hook.Event) {
-		if keyMap[e.Button] {
-			return
-		}
-		keyMap[e.Button] = true
-		scheduleSound("down_mouse")
-	})
+// hook.Register(hook.MouseHold, []string{"mleft"}, func(e hook.Event) {
+//     if keyMap[e.Button] {
+//         return
+//     }
+//     keyMap[e.Button] = true
+//     scheduleSound("down_mouse")
+// })
 
-	hook.Register(hook.MouseDown, []string{"mleft"}, func(e hook.Event) {
-		if keyMap[e.Button] {
-			scheduleSound("up_mouse")
-			keyMap[e.Button] = false
-			return
-		}
-	})
-
-	hook.Register(hook.MouseUp, []string{"mleft"}, func(e hook.Event) {
-		if !keyMap[e.Button] {
-			return
-		}
-		keyMap[e.Button] = false
+hook.Register(hook.MouseDown, []string{"mleft"}, func(e hook.Event) {
+	if keyMap[e.Button] {
 		scheduleSound("up_mouse")
-	})
+		keyMap[e.Button] = false
+		return
+	}
+	keyMap[e.Button] = true
+	scheduleSound("down_mouse")
+})
 
 	s := hook.Start()
 	<-hook.Process(s)
