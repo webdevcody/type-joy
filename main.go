@@ -45,13 +45,13 @@ func loadSound(keyboard string, soundName string) {
 	sounds[soundName] = sound
 }
 
-func getRandomUpKey() string {
+func getRandomDownKey() string {
 	keys := []string{"down1", "down2", "down3", "down4", "down5", "down6", "down7"}
 	key := keys[rand.Intn(len(keys))]
 	return key
 }
 
-func getRandomDownKey() string {
+func getRandomUpKey() string {
 	keys := []string{"up1", "up2", "up3", "up4", "up5", "up6", "up7"}
 	key := keys[rand.Intn(len(keys))]
 	return key
@@ -118,6 +118,22 @@ func main() {
 			playSound(key)
 		}()
 	}
+
+	hook.Register(hook.KeyHold, []string{}, func(e hook.Event) {
+
+		if keyMap[e.Rawcode] {
+			return
+		}
+		keyMap[e.Rawcode] = true
+
+		if e.Rawcode == ENTER {
+			scheduleSound("down_enter")
+		} else if e.Rawcode == SPACE {
+			scheduleSound("down_space")
+		} else {
+			scheduleSound(getRandomDownKey())
+		}
+	})
 
 	hook.Register(hook.KeyDown, []string{"A-Z a-z 0-9"}, func(e hook.Event) {
 
