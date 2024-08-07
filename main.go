@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/getlantern/systray"
 	"github.com/hajimehoshi/go-mp3"
 	"github.com/hajimehoshi/oto"
 	hook "github.com/robotn/gohook"
@@ -57,7 +58,36 @@ func getRandomDownKey() string {
 	return key
 }
 
-func main() {
+func getIcon(filePath string) []byte {
+	// Open the icon file
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatalf("failed to open icon file: %v", err)
+	}
+	defer file.Close()
+
+	// Read the icon file content
+	iconData, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatalf("failed to read icon file: %v", err)
+	}
+
+	return iconData
+}
+
+func onReady() {
+	systray.SetIcon(getIcon("icon.png"))
+	systray.SetTitle("Type Joy")
+	systray.SetTooltip("Type Joy")
+
+	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+	// todo add more system tray icons
+
+	go func() {
+		<-mQuit.ClickedCh
+		systray.Quit()
+		fmt.Println("Quit now...")
+	}()
 
 	if len(os.Args) > 1 {
 		keyboard = os.Args[1]
@@ -178,4 +208,12 @@ func main() {
 	s := hook.Start()
 	<-hook.Process(s)
 	wg.Wait()
+}
+
+func onExit() {
+	// clean up
+}
+
+func main() {
+	systray.Run(onReady, onExit)
 }
